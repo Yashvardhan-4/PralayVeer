@@ -2,6 +2,13 @@
 
 Frontend (Admin + Student) disaster readiness & drill gamification interface.
 
+Repository: https://github.com/Yashvardhan-4/PralayVeer
+
+<!-- Netlify deploy badge (add once site is linked) -->
+<!-- Example after linking:
+[![Netlify Status](https://api.netlify.com/api/v1/badges/ YOUR_SITE_ID /deploy-status)](https://app.netlify.com/sites/YOUR_SITE_NAME/deploys)
+-->
+
 ## Structure
 - `index.html` Admin portal (auth + dashboard)
 - `student_app.html` Student experience (streaks, quizzes, drills, avatar)
@@ -46,6 +53,16 @@ Ensure Firestore & Storage rules restrict writes to authenticated users. Avoid l
 - Add service worker for offline drills
 - Esc key + focus trap in profile slide-over
 - Dark mode toggle
+
+## Contributing
+For now this is a closed prototype; if collaborators are added:
+1. Create a feature branch: `feat/<short-topic>`
+2. Keep commits atomic (present tense): `feat: add streak toast animation`
+3. Open a Pull Request with a concise summary & screenshot / GIF.
+
+Planned files (not yet added):
+- `.github/ISSUE_TEMPLATE/bug_report.md`
+- `.github/pull_request_template.md`
 
 ## License
 Internal prototype (add proper license if open-sourcing).
