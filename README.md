@@ -11,7 +11,7 @@ Repository: https://github.com/Yashvardhan-4/PralayVeer
 
 ## Structure
 - `index.html` Admin portal (auth + dashboard)
-- `student_app.html` Student experience (streaks, quizzes, drills, avatar)
+- `student-app/index.html` Student experience (streaks, quizzes, drills, avatar)
 - `app.js` Admin logic (Firebase, drills, charts)
 - `student_app.js` Student logic (gamification, profile slide-over, Firebase)
 - `style.css` Admin styles
@@ -44,7 +44,7 @@ The CLI will detect `netlify.toml`:
 ```
 
 ## Optional Route Mapping
-If you want `/student` instead of `/student_app.html` uncomment the redirect block in `netlify.toml`.
+If you want `/student` instead of `/student-app/` uncomment the redirect block in `netlify.toml`.
 
 ## Firebase Security (summary)
 Ensure Firestore & Storage rules restrict writes to authenticated users. Avoid leaving wide-open test rules when sharing the URL.

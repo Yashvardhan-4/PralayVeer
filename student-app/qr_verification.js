@@ -80,7 +80,7 @@ class QRVerificationSystem {
     setupEventListeners() {
         // Back to app button
         document.getElementById('backToApp').addEventListener('click', () => {
-            window.location.href = 'student_app.html';
+            window.location.href = 'index.html';
         });
 
         // Scanner controls

@@ -17,8 +17,8 @@
   to = "/index.html"
   status = 200
 
-# Uncomment if you later turn student_app.html into a route like /student
+# Uncomment if you later turn index.html into a route like /student
 # [[redirects]]
 #   from = "/student"
-#   to = "/student_app.html"
+#   to = "/index.html"
 #   status = 200
