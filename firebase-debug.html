@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Debug Helper</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f0f0f0; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Connection Debug Helper</h1>
+    <p>This page helps diagnose Firebase connectivity issues.</p>
+    
+    <div id="results"></div>
+    
+    <button onclick="runDiagnostics()">🔍 Run Full Diagnostics</button>
+    <button onclick="testAnonymousAuth()">🔑 Test Anonymous Auth</button>
+    <button onclick="testFirestoreAccess()">📄 Test Firestore Access</button>
+    <button onclick="clearResults()">🧹 Clear Results</button>
+
+    <script type="module">
+        // Firebase Configuration (same as your app)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDRfw02vOd82RwIXtYVbk-6v9IpQOMuOB4",
+            authDomain: "pralayveer-punjab.firebaseapp.com",
+            projectId: "pralayveer-punjab",
+            storageBucket: "pralayveer-punjab.firebasestorage.app",
+            messagingSenderId: "70951000471",
+            appId: "1:70951000471:web:2fda72af05438fbf984cd2",
+            measurementId: "G-CC7L4LGDEC"
+        };
+
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `${new Date().toLocaleTimeString()}: ${message}`;
+            results.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        window.clearResults = function() {
+            results.innerHTML = '';
+        }
+
+        window.runDiagnostics = async function() {
+            clearResults();
+            addResult('🚀 Starting Firebase diagnostics...', 'info');
+            
+            // 1. Check Firebase initialization
+            try {
+                addResult(`✅ Firebase App initialized successfully (${app.name})`, 'success');
+                addResult(`📱 Project ID: ${firebaseConfig.projectId}`, 'info');
+                addResult(`🔐 Auth Domain: ${firebaseConfig.authDomain}`, 'info');
+            } catch (error) {
+                addResult(`❌ Firebase initialization failed: ${error.message}`, 'error');
+                return;
+            }
+
+            // 2. Check internet connectivity
+            if (!navigator.onLine) {
+                addResult('❌ Device appears to be offline', 'error');
+            } else {
+                addResult('✅ Device is online', 'success');
+            }
+
+            // 3. Test authentication
+            await testAnonymousAuth();
+            
+            // 4. Test Firestore access
+            await testFirestoreAccess();
+        }
+
+        window.testAnonymousAuth = async function() {
+            addResult('🔑 Testing anonymous authentication...', 'info');
+            
+            try {
+                const userCredential = await signInAnonymously(auth);
+                addResult(`✅ Anonymous authentication successful! UID: ${userCredential.user.uid}`, 'success');
+                return userCredential.user;
+            } catch (error) {
+                addResult(`❌ Anonymous authentication failed: ${error.code} - ${error.message}`, 'error');
+                
+                if (error.code === 'auth/admin-restricted-operation') {
+                    addResult('💡 Anonymous authentication is disabled in Firebase Console', 'warning');
+                    addResult('💡 Please enable Anonymous authentication in Firebase Console > Authentication > Sign-in method', 'warning');
+                    addResult('🔄 Trying test email authentication as fallback...', 'info');
+                    return await testEmailAuth();
+                }
+                return null;
+            }
+        }
+        
+        async function testEmailAuth() {
+            // Import additional auth methods
+            const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+            
+            const testEmail = 'test@pralayveer-punjab.com';
+            const testPassword = 'TestPassword123!';
+            
+            try {
+                // Try to sign in first
+                addResult('🔄 Attempting test email sign-in...', 'info');
+                const userCredential = await signInWithEmailAndPassword(auth, testEmail, testPassword);
+                addResult(`✅ Test email authentication successful! UID: ${userCredential.user.uid}`, 'success');
+                return userCredential.user;
+            } catch (signInError) {
+                if (signInError.code === 'auth/user-not-found') {
+                    try {
+                        addResult('🆕 Creating test user account...', 'info');
+                        const userCredential = await createUserWithEmailAndPassword(auth, testEmail, testPassword);
+                        addResult(`✅ Test user created and authenticated! UID: ${userCredential.user.uid}`, 'success');
+                        return userCredential.user;
+                    } catch (createError) {
+                        addResult(`❌ Test user creation failed: ${createError.code} - ${createError.message}`, 'error');
+                        return null;
+                    }
+                } else {
+                    addResult(`❌ Test email authentication failed: ${signInError.code} - ${signInError.message}`, 'error');
+                    return null;
+                }
+            }
+        }
+
+        window.testFirestoreAccess = async function() {
+            addResult('📄 Testing Firestore access...', 'info');
+            
+            if (!auth.currentUser) {
+                addResult('⚠️ No authenticated user, trying to authenticate first...', 'warning');
+                const user = await testAnonymousAuth();
+                if (!user) {
+                    addResult('❌ Cannot test Firestore without authentication', 'error');
+                    return;
+                }
+            }
+
+            try {
+                // Test read
+                addResult('📖 Testing Firestore read access...', 'info');
+                const testCollection = collection(db, 'test');
+                const snapshot = await getDocs(testCollection);
+                addResult(`✅ Firestore read successful! Found ${snapshot.size} documents`, 'success');
+
+                // Test write
+                addResult('✍️ Testing Firestore write access...', 'info');
+                const testDoc = {
+                    message: 'Firebase debug test',
+                    timestamp: serverTimestamp(),
+                    userAgent: navigator.userAgent,
+                    testBy: auth.currentUser.uid
+                };
+                
+                const docRef = await addDoc(testCollection, testDoc);
+                addResult(`✅ Firestore write successful! Document ID: ${docRef.id}`, 'success');
+                
+            } catch (error) {
+                addResult(`❌ Firestore access failed: ${error.code} - ${error.message}`, 'error');
+                
+                if (error.code === 'permission-denied') {
+                    addResult('💡 This suggests Firestore security rules are blocking access', 'warning');
+                    addResult('💡 Make sure your Firestore rules allow anonymous access for testing', 'warning');
+                } else if (error.code === 'unavailable') {
+                    addResult('💡 This suggests network connectivity issues with Firebase', 'warning');
+                }
+            }
+        }
+
+        // Auto-run diagnostics on page load
+        setTimeout(() => {
+            addResult('🏁 Page loaded, ready for diagnostics', 'info');
+        }, 1000);
+    </script>
+</body>
+</html>

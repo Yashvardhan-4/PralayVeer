@@ -1,0 +1,24 @@
+[build]
+  publish = "."
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=600"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "0"
+
+# Add a redirect to ensure clean root
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+# Uncomment if you later turn student_app.html into a route like /student
+# [[redirects]]
+#   from = "/student"
+#   to = "/student_app.html"
+#   status = 200

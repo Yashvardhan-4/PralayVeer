@@ -1,0 +1,470 @@
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f8fafc;
+}
+
+/* Gradient card subtle background */
+.gradient-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(16,185,129,0.08));
+    opacity: 0;
+    transition: opacity .4s ease;
+    pointer-events: none;
+}
+.gradient-card:hover::before {
+    opacity: 1;
+}
+
+/* Tactile active shrink */
+button, .btn, [role="button"] {
+    transition: transform .15s ease, filter .3s ease;
+}
+button:active, .btn:active, [role="button"]:active {
+    transform: scale(.94);
+}
+
+/* XP counter pulse emphasis */
+.xp-pulse {
+    animation: xpPulse 1.2s ease;
+}
+@keyframes xpPulse {
+    0% { transform: scale(1); text-shadow: 0 0 0 rgba(16,185,129,0); }
+    20% { transform: scale(1.25); text-shadow: 0 4px 12px rgba(16,185,129,.4); }
+    60% { transform: scale(1); text-shadow: 0 2px 6px rgba(16,185,129,.25); }
+    100% { transform: scale(1); text-shadow: 0 0 0 rgba(16,185,129,0); }
+}
+
+/* Circular progress smooth transition */
+.progress-anim {
+    transition: stroke-dashoffset 1.2s cubic-bezier(.22,.68,.37,1.02);
+}
+
+/* Toast system */
+#toastContainer {
+    position: fixed;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    z-index: 1000;
+    pointer-events: none;
+}
+.app-toast {
+    background: #ffffff;
+    border-radius: 0.75rem;
+    padding: .75rem 1rem;
+    box-shadow: 0 6px 20px -4px rgba(0,0,0,.18);
+    font-size: .85rem;
+    font-weight: 500;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    animation: toastSlide .55s cubic-bezier(.22,.9,.3,1) forwards, toastFadeOut .5s ease 4.5s forwards;
+    position: relative;
+    overflow: hidden;
+}
+.app-toast::before {
+    content: "";
+    position: absolute; inset:0;
+    background: linear-gradient(120deg, rgba(16,185,129,0.12), rgba(59,130,246,0.12));
+    opacity: 0; transition: opacity .4s;
+}
+.app-toast:hover::before { opacity: 1; }
+@keyframes toastSlide { from { transform: translateY(-18px) scale(.95); opacity:0; } to { transform: translateY(0) scale(1); opacity:1; } }
+@keyframes toastFadeOut { to { opacity:0; transform: translateY(-6px); } }
+
+/* Leaderboard embellishments */
+.leaderboard-item.top-1 { background: linear-gradient(90deg,#fde68a,#fbbf24); color:#7c2d12; }
+.leaderboard-item.top-2 { background: linear-gradient(90deg,#e5e7eb,#d1d5db); color:#374151; }
+.leaderboard-item.top-3 { background: linear-gradient(90deg,#fcd34d,#f59e0b); color:#78350f; }
+.leaderboard-item.current-user { outline: 2px solid #4ade80; position: relative; }
+.leaderboard-item.current-user::after { content: "You"; position:absolute; top:4px; right:8px; font-size:.6rem; background:#4ade80; color:#065f46; padding:2px 6px; border-radius:999px; font-weight:600; }
+
+/* Modal slide-up enhancement */
+.modal-panel { transform: translateY(28px); opacity:0; transition: transform .45s cubic-bezier(.22,.9,.3,1), opacity .45s ease; }
+.modal-open .modal-panel { transform: translateY(0); opacity:1; }
+
+/* Simple fade-in utility */
+/* Avatar circle enhancement */
+#profileSlideOver.open { transform: translateX(0); }
+.open#profileSlideOver { will-change: transform; }
+#profileSlideOver { will-change: transform; }
+.animate-fade-in { animation: fadeIn .6s ease; }
+
+/* General App Styling */
+.screen {
+    display: none;
+}
+.screen.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Authentication Tab Styling */
+.auth-tab {
+    color: #6b7280;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+.auth-tab.active {
+    color: #1f2937;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styling */
+.auth-form {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.auth-form.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Enhanced Input Styling */
+input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Bottom Navigation */
+.nav-btn {
+    color: #9ca3af;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    position: relative;
+}
+
+.nav-btn.active {
+    color: #3b82f6;
+    background-color: #eff6ff;
+    transform: translateY(-2px);
+}
+
+.nav-btn.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background-color: #3b82f6;
+    border-radius: 2px;
+}
+
+.nav-btn:hover {
+    color: #6366f1;
+    background-color: #f0f7ff;
+}
+
+.nav-btn:focus {
+    outline: none;
+}
+
+/* Badge Styling - Enhanced Unlock Animation */
+.badge {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    cursor: pointer;
+}
+
+.badge > div {
+    transition: all 0.5s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Locked State */
+.badge:not(.unlocked) > div {
+    filter: grayscale(100%);
+    opacity: 0.4;
+}
+
+.badge:not(.unlocked) > div::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Unlocked State */
+.badge.unlocked > div {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.badge.unlocked {
+    animation: badgeUnlock 0.8s ease-out;
+}
+
+@keyframes badgeUnlock {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Badge Hover Effects */
+.badge.unlocked:hover {
+    transform: translateY(-2px);
+}
+
+.badge.unlocked:hover > div {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+/* Quiz Modal Enhanced */
+#quizModal {
+    backdrop-filter: blur(10px);
+}
+
+#quizModal.flex {
+    display: flex;
+}
+
+.quiz-option {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid #e5e7eb;
+    position: relative;
+    overflow: hidden;
+}
+
+.quiz-option:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.quiz-option.correct {
+    background-color: #dcfce7;
+    border-color: #22c55e;
+    animation: correctAnswer 0.6s ease;
+}
+
+.quiz-option.incorrect {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    animation: incorrectAnswer 0.6s ease;
+}
+
+@keyframes correctAnswer {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes incorrectAnswer {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+/* Progress Circle Animation */
+#progressCircle {
+    transition: stroke-dashoffset 1s ease-in-out;
+}
+
+/* Level Progress Card Enhancements */
+.progress-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Card Hover Effects */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Drill Alert Animations */
+@keyframes alertPulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.8; 
+        transform: scale(1.02);
+    }
+}
+
+.drill-alert-active {
+    animation: alertPulse 2s infinite;
+}
+
+/* Live Drill Overlay Enhanced */
+#drillModeOverlay {
+    backdrop-filter: blur(5px);
+}
+
+#drillModeOverlay h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Leaderboard Styling */
+.leaderboard-item {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.leaderboard-item:hover {
+    background-color: #f8fafc;
+    border-left-color: #3b82f6;
+    transform: translateX(4px);
+}
+
+.leaderboard-item.top-3 {
+    background: linear-gradient(90deg, #fef3c7 0%, #fbbf24 100%);
+    border-left-color: #f59e0b;
+}
+
+.leaderboard-item.current-user {
+    background: linear-gradient(90deg, #dbeafe 0%, #3b82f6 100%);
+    color: white;
+    font-weight: 600;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+    input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .badge {
+        margin-bottom: 0.5rem;
+    }
+    
+    .nav-btn {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+/* Smooth transitions */
+.transition-colors {
+    transition-property: color, background-color, border-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+}
+
+/* Touch-friendly button sizing */
+button {
+    min-height: 44px;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Loading States */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Success/Error Message Animations */
+.message {
+    transition: all 0.3s ease;
+    transform: translateY(-10px);
+    opacity: 0;
+}
+
+.message.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.message.success {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #22c55e;
+}
+
+.message.error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #ef4444;
+}
+
+/* Enhanced Scroll Behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

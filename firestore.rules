@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    // Optional: roles stored in custom claims or in /roles/{uid}
+    function hasRole(role) {
+      return (request.auth.token.roles != null && role in request.auth.token.roles) ||
+             exists(/databases/$(database)/documents/userRoles/$(uid())) &&
+             get(/databases/$(database)/documents/userRoles/$(uid())).data.roles[role] == true;
+    }
+
+    // ================ STUDENT PROFILES =================
+    match /students/{studentId} {
+      allow create: if isSignedIn() && request.resource.data.email == request.auth.token.email;
+      allow read: if isSignedIn() && (studentId == uid() || hasRole('admin'));
+      allow update: if isSignedIn() && studentId == uid() &&
+        request.resource.data.keys().hasOnly(['name','phone','location','organization','points','lastQuizDate','currentStreak','longestStreak','averageScore','completedQuizzes','badges','drillsParticipated','weakestTopic','recentActivities','lastLoginDate']) &&
+        request.resource.data.points is int && request.resource.data.points >= resource.data.points;
+      allow delete: if false; // Prevent deletion of student profiles via client
+    }
+
+    // ================ QUIZ ATTEMPTS ====================
+    match /quizAttempts/{attemptId} {
+      allow create: if isSignedIn() && request.resource.data.userId == uid();
+      allow read: if isSignedIn() && (resource.data.userId == uid() || hasRole('admin'));
+      allow update, delete: if false; // Immutable records
+    }
+
+    // ================ DRILLS ===========================
+    match /drills/{drillId} {
+      allow read: if true; // Drills are public-readable for scheduling
+      allow create, update, delete: if isSignedIn() && hasRole('admin');
+    }
+
+    // Drill responses (acknowledgements)
+    match /drillResponses/{respId} {
+      allow create: if isSignedIn() && request.resource.data.studentId == uid();
+      allow read: if isSignedIn() && (resource.data.studentId == uid() || hasRole('admin'));
+      allow update, delete: if false;
+    }
+
+    // ================ EVACUATION RECORDS ===============
+    match /evacuation_records/{recId} {
+      allow create: if isSignedIn() && request.resource.data.studentId == uid();
+      allow read: if isSignedIn() && (resource.data.studentId == uid() || hasRole('admin'));
+      allow update, delete: if false; // Immutable audit trail
+    }
+
+    // ================ USER ROLES =======================
+    match /userRoles/{userId} {
+      allow read: if isSignedIn() && (userId == uid() || hasRole('admin'));
+      // Only admins can manage roles. Prevent privilege escalation from client.
+      allow create, update, delete: if isSignedIn() && hasRole('admin');
+    }
+
+    // ================ DEFAULT DENY =====================
+    match /{document=**} {
+      allow read, write: if false; // Explicit deny catch-all
+    }
+  }
+}

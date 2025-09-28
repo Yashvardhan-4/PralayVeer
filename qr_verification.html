@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Verification - PralayVeer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCQM7u0gs3vTcNRVmfJkLUP9QHNOhELPk",
+            authDomain: "pralayveer-web.firebaseapp.com",
+            projectId: "pralayveer-web",
+            storageBucket: "pralayveer-web.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        window.firebaseApp = initializeApp(firebaseConfig);
+        window.db = getFirestore(window.firebaseApp);
+        window.auth = getAuth(window.firebaseApp);
+    </script>
+
+    <style>
+        .scanner-overlay {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scanner-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 250px;
+            height: 250px;
+            transform: translate(-50%, -50%);
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        }
+        
+        .scanner-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #10b981;
+        }
+        
+        .scanner-corner.top-left {
+            top: -3px;
+            left: -3px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .scanner-corner.top-right {
+            top: -3px;
+            right: -3px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .scanner-corner.bottom-left {
+            bottom: -3px;
+            left: -3px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .scanner-corner.bottom-right {
+            bottom: -3px;
+            right: -3px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .success-checkmark {
+            animation: checkmark 0.6s ease-in-out;
+        }
+        
+        @keyframes checkmark {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans flex flex-col min-h-screen">
+    <!-- Mobile Android Style Top Bar -->
+    <header class="px-4 pt-6 pb-4 flex items-center justify-between bg-gradient-to-r from-emerald-600 to-sky-600 shadow-lg">
+        <div class="flex items-center gap-3">
+            <button id="backToApp" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/15 active:scale-95 transition">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </button>
+            <div>
+                <h1 class="text-lg font-semibold tracking-wide">Safe Zone Check-in</h1>
+                <p class="text-xs text-emerald-100">Scan QR at assembly point</p>
+            </div>
+        </div>
+        <div id="studentInfo" class="text-right hidden">
+            <p class="text-xs font-medium" id="studentName">Student Name</p>
+            <p class="text-[10px] text-emerald-100" id="studentId">ID: STU001</p>
+        </div>
+    </header>
+
+    <!-- Scanner / Content Scroll Area -->
+    <main class="flex-1 overflow-y-auto px-4 pb-40 pt-4 space-y-5">
+        <!-- Status Compact Row -->
+        <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="bg-slate-800 rounded-xl p-3 shadow-inner">
+                <p class="text-[10px] uppercase tracking-wide text-slate-400">Status</p>
+                <p id="evacuationStatus" class="text-xs font-medium mt-1">Not Checked</p>
+            </div>
+            <div class="bg-slate-800 rounded-xl p-3 shadow-inner">
+                <p class="text-[10px] uppercase tracking-wide text-slate-400">Safe Zone</p>
+                <p id="safeZoneName" class="text-xs font-medium mt-1 truncate">Scan QR</p>
+            </div>
+            <div class="bg-slate-800 rounded-xl p-3 shadow-inner">
+                <p class="text-[10px] uppercase tracking-wide text-slate-400">Time</p>
+                <p id="checkInTime" class="text-xs font-medium mt-1">--:--</p>
+            </div>
+        </div>
+
+        <!-- Scanner Frame -->
+        <div class="relative rounded-2xl overflow-hidden aspect-square max-w-sm mx-auto shadow-xl ring-1 ring-white/10" id="scannerContainer">
+            <div id="qr-reader" class="w-full h-full"></div>
+            <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div class="w-56 h-56 border-2 border-emerald-400/80 rounded-2xl shadow-[0_0_0_200vmax_rgba(15,23,42,0.75)]"></div>
+            </div>
+        </div>
+
+        <!-- Instruction / Status -->
+        <div id="scannerStatus" class="text-center text-[11px] text-slate-400">
+            Align the QR code inside the frame
+        </div>
+
+        <!-- Recent Activity -->
+        <section>
+            <h2 class="text-xs font-semibold tracking-wide text-slate-300 mb-2">Recent Check-ins</h2>
+            <div id="recentCheckIns" class="space-y-2">
+                <div class="text-center text-slate-500 py-8 text-xs bg-slate-800 rounded-xl border border-slate-700">
+                    <p>No evacuation records yet</p>
+                    <p class="mt-1 text-[10px]">Scan a QR code to create your first record</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Fixed Action Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-xl border-t border-slate-700 px-4 py-3 flex items-center justify-center gap-6 z-40">
+        <button id="startScanBtn" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl text-sm font-medium active:scale-95 transition shadow-lg shadow-emerald-500/20">
+            Start Scan
+        </button>
+        <button id="stopScanBtn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white py-3 rounded-xl text-sm font-medium active:scale-95 transition shadow-lg shadow-rose-500/20 hidden">
+            Stop
+        </button>
+    </nav>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center success-checkmark">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">✅ Check-in Successful!</h3>
+                <p class="text-gray-600 mb-4" id="successMessage">You have successfully checked into the safe zone.</p>
+                <div class="bg-green-50 rounded-lg p-4 mb-4">
+                    <p class="text-sm text-gray-700"><strong>Safe Zone:</strong> <span id="successSafeZone">Main Assembly Point</span></p>
+                    <p class="text-sm text-gray-700"><strong>Time:</strong> <span id="successTime">--:--</span></p>
+                    <p class="text-sm text-gray-700"><strong>Status:</strong> <span class="text-green-600 font-medium">Safely Evacuated</span></p>
+                </div>
+                <button id="closeSuccessModal" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="qr_verification.js"></script>
+</body>
+</html>

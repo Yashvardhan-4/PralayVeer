@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pralayveer - Student App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="student_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-sans">
+    <!-- Global Toasts -->
+    <div id="toastContainer"></div>
+
+    <!-- Student Auth Screen -->
+    <div id="studentAuthScreen" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8 text-white">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="National Emblem" class="h-12 w-12 filter brightness-0 invert">
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Pralayveer Student</h1>
+                <p class="text-blue-100 text-lg">Emergency Preparedness Learning Platform</p>
+                <p class="text-blue-200 text-sm mt-1">Punjab State Disaster Management Authority</p>
+            </div>
+        </div>
+
+        <!-- Auth Form Container -->
+        <div class="flex-1 px-6 py-8">
+            <div class="max-w-sm mx-auto">
+                <!-- Toggle Buttons -->
+                <div class="flex bg-gray-200 rounded-lg p-1 mb-6">
+                    <button id="loginTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors auth-tab active">Login</button>
+                    <button id="registerTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors auth-tab">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="studentLoginForm" class="space-y-4 auth-form active">
+                    <input id="loginEmail" type="email" placeholder="Enter your email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input id="loginPassword" type="password" placeholder="Enter password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" id="loginBtn" class="w-full py-3 px-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">Sign In</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="studentRegisterForm" class="space-y-4 auth-form">
+                    <input id="registerName" type="text" placeholder="Full Name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input id="registerEmail" type="email" placeholder="Email Address" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input id="registerPhone" type="tel" placeholder="Phone Number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input id="registerLocation" type="text" placeholder="City, State" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input id="registerOrganization" type="text" placeholder="School/Organization" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input id="registerPassword" type="password" placeholder="Create Password (min. 6 characters)" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" id="registerBtn" class="w-full py-3 px-4 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors">Create Account</button>
+                </form>
+
+                <div id="studentAuthMessage" class="mt-4 text-center text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student App Container (Hidden) -->
+    <div id="studentAppContainer" class="hidden">
+        <div id="appContent" class="pb-20">
+            <!-- Dashboard Screen -->
+            <div id="dashboardScreen" class="screen active">
+                <header class="bg-white shadow px-4 py-4 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-60 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,#93c5fd,transparent_60%)]"></div>
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex items-start gap-3 items-center">
+                            <button id="profileAvatarBtn" class="relative group focus:outline-none" aria-label="Open Profile">
+                                <div class="avatar-circle w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 text-white flex items-center justify-center font-bold text-lg shadow-inner ring-2 ring-white/70 overflow-hidden select-none">
+                                    <img id="profileAvatarImg" src="" alt="Profile" class="w-full h-full object-cover hidden"/>
+                                    <span id="profileAvatarLetter">S</span>
+                                </div>
+                                <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center text-[10px] font-semibold text-blue-600 border border-blue-100 group-active:scale-95 transition">✎</span>
+                            </button>
+                            <div>
+                                <p class="text-sm text-gray-500">Welcome back,</p>
+                                <h1 id="studentWelcome" class="font-bold text-xl text-gray-800 flex items-center gap-2">Student <span id="loginStreakPill" class="hidden text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-600 font-semibold animate-fade-in">🔥 <span id="loginStreakValue">0</span>d</span></h1>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div id="xpDeltaBubble" class="hidden text-xs font-semibold px-2 py-1 rounded bg-green-100 text-green-600 shadow"></div>
+                            <button id="studentLogout" class="p-2 text-gray-500 hover:text-red-600 transition-colors active:scale-90">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </header>
+                
+                <main class="p-4 space-y-6">
+                    <!-- Connection Status -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div id="connectionStatusDot" class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                <span class="text-xs font-medium text-green-800">Live Updates Active</span>
+                            </div>
+                            <span id="connectionTimestamp" class="text-xs text-green-600">Connected</span>
+                        </div>
+                        <p class="text-xs text-green-700 mt-1">Receiving real-time drill alerts and notifications</p>
+                        <button onclick="window.studentApp.testFirebaseConnection()" class="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
+                            Test Connection
+                        </button>
+                    </div>
+
+                    <!-- Level Progress Card -->
+                    <div class="bg-white gradient-card p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-800">Your Progress</h3>
+                            <span class="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Level <span id="studentLevelText">1</span></span>
+                        </div>
+                        
+                        <!-- Circular Progress -->
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="relative w-24 h-24">
+                                <svg class="w-24 h-24" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                                    <circle id="progressCircle" cx="50" cy="50" r="45" stroke="#3b82f6" stroke-width="8" fill="none" 
+                                            stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" 
+                                            transform="rotate(-90 50 50)" class="transition-all duration-1000" />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="progressPercentage" class="text-sm font-bold text-gray-800">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="bg-blue-50 p-3 rounded-lg">
+                                <p class="text-xs text-blue-600 font-medium">Level</p>
+                                <p id="studentLevel" class="text-xl font-bold text-blue-700">1</p>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded-lg">
+                                <p class="text-xs text-green-600 font-medium">XP Points</p>
+                                <p id="studentPoints" class="text-xl font-bold text-green-700">0</p>
+                            </div>
+                            <div class="bg-orange-50 p-3 rounded-lg">
+                                <p class="text-xs text-orange-600 font-medium">Daily Streak</p>
+                                <p id="studentStreak" class="text-xl font-bold text-orange-700">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Badges Card -->
+                    <div class="bg-white gradient-card p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <h3 class="font-semibold mb-4 text-gray-800 flex items-center">
+                            <span class="mr-2">🏆</span>
+                            Safety Badges
+                        </h3>
+                        <div id="badgeContainer" class="grid grid-cols-3 gap-4">
+                            <!-- Fire Safety Badge -->
+                            <div class="text-center badge fire-badge" data-points="500">
+                                <div class="w-16 h-16 mx-auto mb-2 bg-gray-100 rounded-full flex items-center justify-center text-2xl grayscale">
+                                    🔥
+                                </div>
+                                <p class="text-xs text-gray-500 font-medium">Fire Safety</p>
+                                <p class="text-xs text-gray-400">500 XP</p>
+                            </div>
+                            
+                            <!-- Earthquake Badge -->
+                            <div class="text-center badge earthquake-badge" data-points="1000">
+                                <div class="w-16 h-16 mx-auto mb-2 bg-gray-100 rounded-full flex items-center justify-center text-2xl grayscale">
+                                    🌍
+                                </div>
+                                <p class="text-xs text-gray-500 font-medium">Earthquake</p>
+                                <p class="text-xs text-gray-400">1000 XP</p>
+                            </div>
+                            
+                            <!-- Master Badge -->
+                            <div class="text-center badge master-badge" data-points="2000">
+                                <div class="w-16 h-16 mx-auto mb-2 bg-gray-100 rounded-full flex items-center justify-center text-2xl grayscale">
+                                    🛡️
+                                </div>
+                                <p class="text-xs text-gray-500 font-medium">Master</p>
+                                <p class="text-xs text-gray-400">2000 XP</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Drill Alert Card -->
+                    <div class="bg-white gradient-card p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <h3 class="font-semibold mb-3 text-gray-800 flex items-center">
+                            <span class="mr-2">⚠️</span>
+                            Drill Alerts
+                        </h3>
+                        <div id="drillAlert" class="bg-orange-50 border border-orange-200 rounded-lg p-4 hidden">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <span class="font-semibold text-orange-800">Upcoming Drill</span>
+                            </div>
+                            <p id="nextDrillInfo" class="text-sm text-orange-700">No upcoming drills scheduled</p>
+                            <div id="adminUpcomingDrillActions" class="mt-3 hidden">
+                                <button id="cancelDrillBtn" class="w-full py-2 px-3 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition-colors">Cancel Scheduled Drill</button>
+                            </div>
+                        </div>
+                        <div id="noDrillAlert" class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="font-semibold text-green-800">All Clear</span>
+                            </div>
+                            <p class="text-sm text-green-700">No drills scheduled at this time</p>
+                        </div>
+                    </div>
+
+                    <!-- Daily Quiz Card -->
+                    <div class="bg-white gradient-card p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <h3 class="font-semibold mb-3 text-gray-800 flex items-center">
+                            <span class="mr-2">📚</span>
+                            Daily Safety Quiz
+                        </h3>
+                        <p class="text-sm text-gray-600 mb-4">Test your emergency preparedness knowledge and earn XP points!</p>
+                        <button id="dailyQuizBtn" class="w-full py-3 px-4 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                            Take Today's Quiz
+                        </button>
+                        <p id="quizStatus" class="text-xs text-center mt-2 text-gray-500"></p>
+                    </div>
+
+                    <!-- Recent Quiz Performance Card -->
+                    <div id="recentQuizCard" class="bg-white gradient-card p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <h3 class="font-semibold mb-3 text-gray-800 flex items-center">
+                            <span class="mr-2">🎯</span>
+                            Recent Quiz Performance
+                        </h3>
+                        <div id="recentQuizSummary" class="text-sm text-gray-600 mb-3">Loading recent attempts...</div>
+                        <div id="recentQuizList" class="space-y-2"></div>
+                        <div id="quizAccuracyBar" class="mt-4 hidden">
+                            <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                                <span>Accuracy</span><span id="quizAccuracyPct">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                                <div id="quizAccuracyFill" class="h-2 bg-green-500" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Tools & Advanced Features -->
+                    <div class="bg-white gradient-card p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <h3 class="font-semibold mb-4 text-gray-800 flex items-center">
+                            <span class="mr-2">🧭</span>
+                            Safety Tools
+                        </h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <button onclick="window.location.href='safety_maps.html'" class="w-full py-3 px-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2">
+                                <span>🗺️</span><span>Open Live Safety Map</span>
+                            </button>
+                            <button onclick="window.location.href='qr_verification.html'" class="w-full py-3 px-4 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-colors flex items-center justify-center space-x-2">
+                                <span>📷</span><span>Evacuation Check-In (QR)</span>
+                            </button>
+                            <button id="advancedQuizBtn" class="w-full py-3 px-4 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2">
+                                <span>🤖</span><span>Adaptive AI Quiz</span>
+                            </button>
+                            <button id="endlessQuizBtn" class="w-full py-2.5 px-4 bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors flex items-center justify-center space-x-2">
+                                <span>♾️</span><span>Endless Quiz Mode</span>
+                            </button>
+                        </div>
+                        <p id="advancedQuizStatus" class="text-xs text-center mt-3 text-gray-500"></p>
+                    </div>
+
+                    <!-- Evacuation Check-Ins Summary -->
+                    <div id="evacSummaryCard" class="bg-white gradient-card p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <h3 class="font-semibold mb-3 text-gray-800 flex items-center">
+                            <span class="mr-2">🚏</span>
+                            Evacuation Check-Ins
+                        </h3>
+                        <div id="evacSummaryStatus" class="text-sm text-gray-600 mb-3">Loading evacuation data...</div>
+                        <div id="evacLatest" class="space-y-2"></div>
+                        <button onclick="window.location.href='qr_verification.html'" class="mt-4 w-full py-2 px-4 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors">Open QR Check-In</button>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Removed obsolete profile/achievement markup per new avatar design -->
+
+            <!-- Leaderboard Screen -->
+            <div id="leaderboardScreen" class="screen hidden">
+                <header class="bg-white shadow px-4 py-4 mb-4">
+                    <h1 class="text-2xl font-bold text-gray-800 text-center">🏆 Leaderboard</h1>
+                    <p class="text-sm text-gray-500 text-center">Top emergency preparedness champions</p>
+                </header>
+                
+                <div class="p-4">
+                    <div class="space-y-3" id="fullLeaderboardList">
+                        <!-- Leaderboard items will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+            <div class="flex justify-around">
+                <button data-screen="dashboardScreen" class="nav-btn active flex-1 flex flex-col items-center py-3">
+                    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="text-xs font-medium">Dashboard</span>
+                </button>
+                <button data-screen="leaderboardScreen" class="nav-btn flex-1 flex flex-col items-center py-3">
+                    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span class="text-xs font-medium">Leaderboard</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Daily Quiz Modal -->
+    <div id="quizModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-20">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg relative flex flex-col max-h-[90vh]">
+            <button id="closeQuizBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <div class="p-5 border-b border-gray-100 space-y-3" id="quizHeader">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <span id="quizIcon" class="text-2xl mr-3">📚</span>
+                        <h2 id="quizTitle" class="text-xl font-bold text-gray-800">Daily Safety Quiz</h2>
+                    </div>
+                    <div id="adaptiveProgressWrapper" class="hidden text-right">
+                        <p id="adaptiveProgressText" class="text-xs font-medium text-gray-500">Question 1/10</p>
+                        <div class="w-40 bg-gray-200 h-1.5 rounded-full overflow-hidden mt-1">
+                            <div id="adaptiveProgressBar" class="h-1.5 bg-purple-500 w-0 transition-all"></div>
+                        </div>
+                    </div>
+                </div>
+                <p id="quizQuestion" class="text-gray-700 leading-relaxed text-sm"></p>
+            </div>
+            
+            <div id="quizOptions" class="p-5 space-y-3 overflow-y-auto flex-1">
+                <!-- Options will be injected here -->
+            </div>
+            
+            <div id="quizResult" class="p-6 text-center border-t border-gray-100 hidden">
+                <!-- Result will be shown here -->
+            </div>
+
+            <div id="adaptiveNav" class="px-5 py-4 border-t border-gray-100 bg-gray-50 hidden">
+                <div class="flex items-center justify-between gap-3">
+                    <button id="adaptivePrevBtn" class="flex-1 py-2 px-4 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+                    <button id="adaptiveNextBtn" class="flex-1 py-2 px-4 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+                    <button id="adaptiveSubmitBtn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 hidden">Submit</button>
+                </div>
+                <div class="mt-3 flex items-center justify-between text-[11px] text-gray-500">
+                    <span id="adaptiveModeLabel">Adaptive Session</span>
+                    <button id="endlessAddMoreBtn" class="hidden text-indigo-600 hover:text-indigo-800 font-medium">Add More Questions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div id="profileEditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-20">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
+            <button id="closeProfileEditBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center mb-3">
+                    <span class="text-2xl mr-3">✏️</span>
+                    <h2 class="text-xl font-bold text-gray-800">Edit Profile</h2>
+                </div>
+                <p class="text-sm text-gray-600">Update your personal information</p>
+            </div>
+            
+            <form id="profileEditForm" class="p-6 space-y-4">
+                <div>
+                    <label for="editProfileName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input id="editProfileName" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="editProfilePhone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input id="editProfilePhone" type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="editProfileLocation" class="block text-sm font-medium text-gray-700 mb-1">Location (City, State)</label>
+                    <input id="editProfileLocation" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="editProfileOrganization" class="block text-sm font-medium text-gray-700 mb-1">School/Organization</label>
+                    <input id="editProfileOrganization" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" id="cancelProfileEditBtn" class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveProfileBtn" class="flex-1 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Slide Over -->
+    <div id="profileSlideBackdrop" class="fixed inset-0 bg-black bg-opacity-30 hidden z-30"></div>
+    <div id="profileSlideOver" class="fixed inset-y-0 left-0 w-80 max-w-full bg-white shadow-2xl border-r border-gray-200 transform -translate-x-full transition-transform duration-300 z-40 flex flex-col">
+        <div class="px-5 pt-5 pb-4 border-b border-gray-100 flex items-start gap-3">
+            <div class="avatar-circle w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 text-white flex items-center justify-center font-bold text-2xl select-none relative overflow-hidden">
+                <img id="slideAvatarImg" class="hidden w-full h-full object-cover" alt="Profile" />
+                <span id="slideAvatarLetter">S</span>
+            </div>
+            <div class="flex-1">
+                <h2 id="slideProfileName" class="font-semibold text-gray-800 text-lg">Student</h2>
+                <p id="slideProfileEmail" class="text-xs text-gray-500 break-all">—</p>
+                <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-medium">
+                    <span id="slideLevelBadge" class="px-2 py-1 rounded-full bg-blue-50 text-blue-600">Lvl 1</span>
+                    <span id="slideStreakBadge" class="px-2 py-1 rounded-full bg-orange-50 text-orange-600 hidden">🔥 0d</span>
+                </div>
+            </div>
+            <button id="closeSlideOverBtn" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5 space-y-6">
+            <div>
+                <h3 class="text-xs font-semibold tracking-wide text-gray-500 mb-2">ACCOUNT</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-500">Points</span><span id="slidePoints" class="font-medium text-gray-800">0</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Current Streak</span><span id="slideCurrentStreak" class="font-medium text-gray-800">0</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Longest Streak</span><span id="slideLongestStreak" class="font-medium text-gray-800">0</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Quizzes</span><span id="slideQuizzes" class="font-medium text-gray-800">0</span></div>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xs font-semibold tracking-wide text-gray-500 mb-2">ACTIONS</h3>
+                <div class="space-y-2">
+                    <button id="slideChangePhotoBtn" class="w-full text-left px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-sm font-medium text-blue-600 flex items-center gap-2"><span>🖼️</span><span>Change Photo</span></button>
+                    <button id="slideEditProfileBtn" class="w-full text-left px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm font-medium flex items-center gap-2"><span>✏️</span><span>Edit Profile</span></button>
+                    <button id="slideLogoutBtn" class="w-full text-left px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-sm font-medium text-red-600 flex items-center gap-2"><span>🚪</span><span>Logout</span></button>
+                    <input id="avatarFileInput" type="file" accept="image/*" class="hidden" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Drill Mode Overlay -->
+    <div id="drillModeOverlay" class="fixed inset-0 bg-red-900 bg-opacity-95 hidden flex-col items-center justify-center text-white text-center p-8 z-50">
+        <div class="animate-ping absolute inline-flex h-32 w-32 rounded-full bg-red-400 opacity-75 z-0"></div>
+        <div class="relative z-20">
+            <h1 class="text-5xl font-bold mb-4 animate-pulse">🚨 DRILL ALERT</h1>
+            <p id="drillName" class="text-2xl mb-8 font-semibold"></p>
+            <p class="text-lg mb-8 max-w-md">This is a simulated emergency drill. Please follow all instructions from your supervisors and evacuate calmly.</p>
+            <button id="acknowledgeDrillBtn" class="relative z-30 px-8 py-4 bg-white text-red-800 font-bold rounded-lg text-lg hover:bg-gray-100 transition-colors shadow-lg cursor-pointer" onclick="window.studentApp && window.studentApp.acknowledgeDrill()" style="pointer-events: auto;">
+                I Acknowledge This Drill
+            </button>
+            <p class="text-sm mt-4 opacity-75">Click to confirm you have received this alert</p>
+            <div id="adminActiveDrillActions" class="mt-6 hidden">
+                <button id="stopActiveDrillBtn" class="px-6 py-3 bg-yellow-400 text-red-900 font-semibold rounded-lg text-sm hover:bg-yellow-500 transition-colors shadow">Stop Active Drill</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Student App -->
+    <script type="module" src="student_app.js"></script>
+    <!-- AI Quiz Generator (modular logic used inside student_app.js if available) -->
+    <script src="ai_quiz_generator.js"></script>
+</body>
+</html>
